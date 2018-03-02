@@ -13,6 +13,7 @@
 # importa librerias necesarias: "math", "numpy, "random", "bisect", "operator" y "system"
 # usualmente todas ya vienen instaladas en el nucleo python excepto "numpy" 
 # hay una version en git/pyMD
+# version modificada en yoga
 import math
 import numpy as np
 import random
