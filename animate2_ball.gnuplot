@@ -8,10 +8,10 @@ set xrange[-LX*0.5:LX*0.5]
 set yrange[-LY*0.5:LY*0.5]
 set size ratio LY/LX
 
-cd 'Datos'
+cd '/home/fvega/Datos/pyMD/'
 
-do for[count=150:nt]{
-    pause 3
+do for[count=0:nt]{
+    pause 0.1
     frame = 'xy'.count
     if (count<1000) {frame='xy0'.count}
     if (count<100) {frame='xy00'.count}

@@ -262,13 +262,13 @@ def colisiona(par):
 ##     print ("####### no. archivo: ########", ja) # n. de archivo #opcional
 ##     inum='{0:05d}'.format(ja)
 
-##     nombre='Datos/xy'+inum+'.dat'
+##     nombre='/home/fvega/Datos/pyMD/xy'+inum+'.dat'
 ##     xy= pd.DataFrame( np.array([[x[i],y[i]] for i in range(len(x))]) )
 ##     xy.to_csv(nombre, delimiter='\t',\
 ##                header =['x','y'] , index=False,float_format='%7.3f')
    
 ##     # formatea el nombre de archivo de posiciones 
-##     nombre='Datos/vxvy'+inum+'.dat'
+##     nombre='/home/fvega/Datos/pyMD/vxvy'+inum+'.dat'
 ##     vxvy= pd.DataFrame( np.array([[vx[i],vy[i]] for i in range(len(x))]) )
 ##     vxvy.to_csv(nombre, delimiter='\t', \
 ##                 header =['vx','vy'] , index=False, float_format='%7.3f')
@@ -281,14 +281,14 @@ def write_micr_state(ja):
     print ("####### no. archivo: ########", ja) # n. de archivo #opcional
     inum='{0:04d}'.format(ja)
 
-    nombre='Datos/xy'+inum+'.dat'
+    nombre='/home/fvega/Datos/pyMD/xy'+inum+'.dat'
     with open(nombre,'w') as archivo:
         for i in range(npart):
             archivo.write('{0:10.2f} {1:10.2f}\n'.format( x[i], y[i]))
     archivo.closed
 
     # formatea el nombre de archivo de posiciones 
-    nombre='Datos/vxvy'+inum+'.dat'
+    nombre='/home/fvega/Datos/pyMD/vxvy'+inum+'.dat'
     with open(nombre,'w') as archivo:
         for i in range(npart):
             archivo.write('{0:10.2f} {1:10.2f}\n'.format( vx[i], vy[i]))
@@ -349,7 +349,7 @@ def calculate_averages(ja):
 
 # wites average fields evolution, in a final file
 def write_averages_evol():
-    nombre='Datos/temp.dat'
+    nombre='/home/fvega/Datos/pyMD/temp.dat'
     xy= pd.DataFrame( np.array([[temp[i],a2[i]] for i in range(len(temp))]) )
     xy.to_csv(nombre, sep='\t',\
                header =['T','a2'] , index=False,float_format='%8.5f')
