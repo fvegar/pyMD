@@ -24,8 +24,8 @@ from os import system, remove
 # radio de las particulas
 R=1.
 # tamano del sistema
-LX = 30*R
-LY = 30*R
+LX = 10*R
+LY = 10*R
 # tamano del sistema menos un radio (para situar las particulas)
 LXR = LX*0.5-R
 LYR = LY*0.5-R
@@ -34,7 +34,7 @@ LYR = LY*0.5-R
 # numero de particulas
 #npart = int(math.floor(nu*LX*LY/(math.pi*R*R)))
 
-npart = 40
+npart = 10
 # numero de pasos temporales (cols.)
 #nt = 100 * npart
 nt = 2000

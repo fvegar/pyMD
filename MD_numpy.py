@@ -1,4 +1,4 @@
- # DINAMICA MOLECULAR EN python, DISCOS DUROS    #####
+# DINAMICA MOLECULAR EN python, DISCOS DUROS    #####
 # Fisica Estadistica, UEx, en Roma, mayo 2015   #####
                                                 #####
 # VERSION 1.0                                   #####
@@ -13,7 +13,6 @@
 # importa librerias necesarias: "math", "numpy, "random", "bisect", "operator" y "system"
 # usualmente todas ya vienen instaladas en el nucleo python excepto "numpy" 
 # hay una version en git/pyMD
-# version modificada en yoga
 import math
 import numpy as np
 import random
@@ -27,8 +26,8 @@ import pandas as pd
 # radio de las particulas
 R=1.
 # tamano del sistema
-LX = 10*R
-LY = 10*R
+LX = 10*R #112.09982432795857*R
+LY = 10*R #112.09982432795857*R
 # tamano del sistema menos un radio (para situar las particulas)
 LXR = LX*0.5-R
 LYR = LY*0.5-R
@@ -39,8 +38,7 @@ LYR = LY*0.5-R
 
 npart = 10
 # numero de pasos temporales (cols.)
-#nt = 100 * npart
-nt = 2000
+nt = 100 * npart
 
 # coef. de restitucion
 alfa = 1.0
@@ -262,13 +260,13 @@ def colisiona(par):
 
 ##     print ("####### it: ########", it) # imprime it (n. de cols.) #opcional
 ##     print ("####### no. archivo: ########", ja) # n. de archivo #opcional
-##     inum='{0:04d}'.format(ja)
+##     inum='{0:05d}'.format(ja)
 
 ##     nombre='Datos/xy'+inum+'.dat'
 ##     xy= pd.DataFrame( np.array([[x[i],y[i]] for i in range(len(x))]) )
 ##     xy.to_csv(nombre, delimiter='\t',\
 ##                header =['x','y'] , index=False,float_format='%7.3f')
-    
+   
 ##     # formatea el nombre de archivo de posiciones 
 ##     nombre='Datos/vxvy'+inum+'.dat'
 ##     vxvy= pd.DataFrame( np.array([[vx[i],vy[i]] for i in range(len(x))]) )
