@@ -25,20 +25,14 @@ import pandas as pd
 
 # radio de las particulas
 R=1.
-# tamano del sistema
-LX = 10*R #112.09982432795857*R
-LY = 10*R #112.09982432795857*R
-# tamano del sistema menos un radio (para situar las particulas)
-LXR = LX*0.5-R
-LYR = LY*0.5-R
-# fraccion de empaquetamiento
-#nu = 0.72
+# numero de particulas para la simulacion
+npart = 1000
+
 # numero de particulas
 #npart = int(math.floor(nu*LX*LY/(math.pi*R*R)))
 
-npart = 10
-# numero de pasos temporales (cols.)
-nt = 100 * npart
+# numero de pasos temporales (cols. x particula)
+nt = 10 * npart
 
 # coef. de restitucion
 alfa = 1.0
@@ -56,17 +50,9 @@ ncp=1.0*nt/npart
 utermo = 1
 #utermo=int(math.ceil(icp))
 
-
-#   inicializa listas de velocidades y posiciones 
-vx = np.array([0. for i in range(npart)])
-vy = np.array([0. for i in range(npart)])
-
-x = np.array([0. for i in range(npart)])
-y = np.array([0. for i in range(npart)])
-
 #   inicializa listas temporales de T y a2 
-temp = np.array([0. for i in range(nt+1)])
-a2 = np.array([0. for i in range(nt+1)])
+temp = np.zeros(nt+1)
+a2 = np.zeros(nt+1)
 
 #inicializa listas relacionadas con las colisiones
 listacol = []
@@ -82,6 +68,94 @@ it = 0
 # es decir, ejecuciones consecutivas hacen simulaciones estadisticamente diferentes (replicas)
 # si no se quiere esta propiedad, escribir: random.seed(1)
 random.seed()
+
+
+################################################
+##### FUNCION inicializa arrays de pos, vel   ##
+################################################
+    
+def initialize_xv_arrays():
+    global x, y, vx, vy
+    #   inicializa arrays de posiciones
+    x = np.zeros(npart)
+    y = np.zeros(npart)
+    #   inicializa arrays de velocidades    
+    vx = np.zeros(npart)
+    vy = np.zeros(npart)
+    
+
+
+###################################
+##### FUNCION initialize_random  ##
+###################################
+    
+def initialize_random():
+    global x, y, vx, vy
+
+    initialize_xv_arrays()
+    
+    # colocacion de las particulas
+    x[0]=random.uniform(-LXR, LXR)
+    y[0]=random.uniform(-LYR, LYR)
+
+    # condicion de solapamiento
+    for i in range(1,npart):
+       dr=False
+       while dr==False:
+           x[i]=random.uniform(-LXR, LXR)
+           y[i]=random.uniform(-LYR, LYR)
+           # condicion de no solapamiento con las pos. ya generadas
+           for j in range(0,i):
+               dr=((x[i]-x[j])*(x[i]-x[j])+(y[i]-y[j])*(y[i]-y[j])>4*R*R)
+               if dr==False:
+                  break
+
+
+###################################
+##### FUNCION initialize_square  ##
+###################################
+    
+def initialize_square():    
+    global x, y, LX, LY, npart
+
+    NL = int(round( np.sqrt(npart) ))
+    npart = NL**2 # correct no. of particles to first number with integer sq. root
+
+    initialize_xv_arrays()
+    
+    xr = R * ( np.sqrt(np.pi/(4 * nu)) - 1 )
+    LX = 2 * np.sqrt(npart * np.pi/(4* nu) )  
+    LY = LX # sistema cuadrado si se determina tamano a partir de nu
+
+    print('xr: ', xr)
+    print('LX: ', LX)
+    print('LY: ', LY)
+    
+    # colocar partículas en una red cuadrada
+    # para una fraccion de empaquetamiento dada
+    # evintando solapamiento
+    ii = 0 # particle pseudo-index for 
+    for i in range(1,NL+1):
+        for j in range(1,NL+1):
+            x[ii] = (R + xr) + (i-1) * 2 * (R+ xr)
+            y[ii] = (R + xr) + (j-1) * 2 * (R+ xr)
+            ii = ii + 1
+
+    for i in range(npart):
+        x[i] = x[i] - LX * 0.5
+        y[i] = y[i] - LY * 0.5
+
+
+########################################
+##### FUNCION initialize_vels_normal  ##
+########################################
+    
+def initialize_vels_normal():
+
+    #   velocidades aleatorias para las velocidades, distribucion gaussiana
+    for i in range(npart):
+        vx[i] = np.random.randn()
+        vy[i] = np.random.randn()
 
 
 
@@ -118,6 +192,7 @@ def midedist(i,j):
 
 def tcol(i,j):
     global vx, vy, x, y
+#    print(LX)
     dx = x[i] - x[j]
     dy = y[i] - y[j]
     dvx = vx[i] - vx[j]
@@ -161,7 +236,6 @@ def tcol(i,j):
 
 
 
-
 #########################
 ##### FUNCION tpcol #####
 #########################
@@ -170,6 +244,7 @@ def tcol(i,j):
 
 def tpcol(i):
     global vx, vy, x, y
+
     if vx[i] == 0:
         tx = float('inf')
     elif vx[i] < 0:
@@ -262,13 +337,13 @@ def colisiona(par):
 ##     print ("####### no. archivo: ########", ja) # n. de archivo #opcional
 ##     inum='{0:05d}'.format(ja)
 
-##     nombre='/home/fvega/Datos/pyMD/xy'+inum+'.dat'
+##     nombre='Datos/xy'+inum+'.dat'
 ##     xy= pd.DataFrame( np.array([[x[i],y[i]] for i in range(len(x))]) )
 ##     xy.to_csv(nombre, delimiter='\t',\
 ##                header =['x','y'] , index=False,float_format='%7.3f')
-   
+    
 ##     # formatea el nombre de archivo de posiciones 
-##     nombre='/home/fvega/Datos/pyMD/vxvy'+inum+'.dat'
+##     nombre='Datos/vxvy'+inum+'.dat'
 ##     vxvy= pd.DataFrame( np.array([[vx[i],vy[i]] for i in range(len(x))]) )
 ##     vxvy.to_csv(nombre, delimiter='\t', \
 ##                 header =['vx','vy'] , index=False, float_format='%7.3f')
@@ -281,48 +356,19 @@ def write_micr_state(ja):
     print ("####### no. archivo: ########", ja) # n. de archivo #opcional
     inum='{0:04d}'.format(ja)
 
-    nombre='/home/fvega/Datos/pyMD/xy'+inum+'.dat'
+    nombre='Datos/xy'+inum+'.dat'
     with open(nombre,'w') as archivo:
         for i in range(npart):
             archivo.write('{0:10.2f} {1:10.2f}\n'.format( x[i], y[i]))
     archivo.closed
 
     # formatea el nombre de archivo de posiciones 
-    nombre='/home/fvega/Datos/pyMD/vxvy'+inum+'.dat'
+    nombre='Datos/vxvy'+inum+'.dat'
     with open(nombre,'w') as archivo:
         for i in range(npart):
             archivo.write('{0:10.2f} {1:10.2f}\n'.format( vx[i], vy[i]))
-    archivo.closed
-
-
-###################################
-##### FUNCION initialize_random  ##
-###################################
-    
-def initialize_random():
-    global vx, vy, x, y
-    # colocacion de las particulas
-    x[0]=random.uniform(-LXR, LXR)
-    y[0]=random.uniform(-LYR, LYR)
-
-    # condicion de solapamiento
-    for i in range(1,npart):
-       dr=False
-       while dr==False:
-           x[i]=random.uniform(-LXR, LXR)
-           y[i]=random.uniform(-LYR, LYR)
-           # condicion de no solapamiento con las pos. ya generadas
-           for j in range(0,i):
-               dr=((x[i]-x[j])*(x[i]-x[j])+(y[i]-y[j])*(y[i]-y[j])>4*R*R)
-               if dr==False:
-                  break
-
-
-    #   velocidades aleatorias para las velocidades, distribucion gaussiana
-    for i in range(npart):
-        vx[i]=np.random.randn()
-        vy[i]=np.random.randn()
-
+    archivo.closed    
+        
         
 ###################################
 ##### FUNCION calculate_averages ##
@@ -349,7 +395,7 @@ def calculate_averages(ja):
 
 # wites average fields evolution, in a final file
 def write_averages_evol():
-    nombre='/home/fvega/Datos/pyMD/temp.dat'
+    nombre='Datos/temp.dat'
     xy= pd.DataFrame( np.array([[temp[i],a2[i]] for i in range(len(temp))]) )
     xy.to_csv(nombre, sep='\t',\
                header =['T','a2'] , index=False,float_format='%8.5f')
@@ -377,10 +423,34 @@ print("no. de archivos: ", nt/utermo)
 #   genera posiciones aleatorias -no solapantes- para las particulas
 #   este algoritmo de colocacion es necesario sustituirlo para densidades altas por otro mejor
 
+square = True
 
-initialize_random()
+if square==True:
+    print("estado inicial en red cuadrada\n")
+    # fraccion de empaquetamiento
+    nu = 0.4
+    print("fraccion de empaquetamiento: ", nu, "\n")
+    initialize_square()
+     # medio tamano del sistema menos medio radio (para situar las particulas)
+    # con origen de coordenadas en el centro del sistema
+    LXR = LX * 0.5 - R
+    LYR = LY * 0.5 - R
+else:
+    # tamano del sistema
+    LX = 16*R
+    LY = 16*R
+    # medio tamano del sistema menos medio radio (para situar las particulas)
+    # con origen de coordenadas en el centro del sistema
+    LXR = LX * 0.5 - R
+    LYR = LY * 0.5 - R
 
+    # inicializa
+    initialize_random()
+
+    
+initialize_vels_normal()
 write_micr_state(0)
+
 
 #### bucle en particulas. Calcula tiempos iniciales de colision 
 
